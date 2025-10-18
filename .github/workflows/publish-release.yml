@@ -1,0 +1,32 @@
+name: Publish draft
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to publish'
+        required: true
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Mark release as published
+        uses: actions-ecosystem/action-update-release@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.event.inputs.tag }}
+          draft: false
+          prerelease: false
+
+      - name: "Optional: set release as latest"
+        run: |
+          echo "Release ${{ github.event.inputs.tag }} marked published. Consider marking as latest via GitHub UI if desired."

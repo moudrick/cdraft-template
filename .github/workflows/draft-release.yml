@@ -1,0 +1,45 @@
+name: Draft release (CI build)
+
+on:
+  push:
+    tags:
+      - 'v*.*.**' # match tags like v1.2.3 and v1.2.3-poc; adapt if needed
+
+permissions:
+  contents: write
+  packages: write
+  actions: write
+
+jobs:
+  build-and-draft:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.20'
+
+      - name: Install goreleaser
+        uses: goreleaser/goreleaser-action@v3
+        with:
+          version: latest
+          args: --rm-dist
+
+      - name: Run goreleaser (draft)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          goreleaser release --rm-dist --snapshot --skip-publish || true
+
+      - name: Run goreleaser to publish a Draft GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Run goreleaser with draft enabled in .goreleaser.yml; this will create a draft release and upload artifacts
+          goreleaser release --rm-dist || exit 1
+

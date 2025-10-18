@@ -1,0 +1,23 @@
+project_name: myapp
+
+release:
+  draft: true
+  # "overwrite" in goreleaser context means that goreleaser will attempt
+  # to create the release and update assets. Behavior depends on GitHub api.
+
+builds:
+  - id: myapp
+    main: ./cmd/myapp
+    binary: myapp
+
+archives:
+  - format: tar.gz
+
+changelog:
+  skip: true
+
+github:
+  owner: your-org-or-user
+  name: your-repo
+
+# add other goreleaser sections (signing, brew, snap, etc.) as needed
